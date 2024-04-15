@@ -45,11 +45,11 @@ function run_sensitivity_analysis(sens_parameters)
         for variation = variation_range
             % Adjust parameters accordingly
             beta_adj = beta * (1 + variation/100);
-            gamma_adj = gamma * (1 + variation/100);
+            gamma_adj = gamma; %* (1 + variation/100);
             delta_adj = delta * (1 + variation/100);
             epsilon_adj = epsilon * (1 + variation/100);
-            q_adj = q * (1 + variation/100);
-            v_adj = v * (1 + variation/100);
+            q_adj = q; %* (1 + variation/100);
+            v_adj = v; %* (1 + variation/100);
 
             % Solve ODE with adjusted parameters
             if modelIdx == 1
@@ -77,55 +77,4 @@ function run_sensitivity_analysis(sens_parameters)
             close(figRegular);
         end
     end
-end
-
-function saveGifFrame(fig, filename, firstFrame)
-    drawnow;
-    frame = getframe(fig);
-    im = frame2im(frame);
-    [imind, cm] = rgb2ind(im, 256);
-    if firstFrame
-        imwrite(imind, cm, filename, 'gif', 'Loopcount', inf);
-    else
-        imwrite(imind, cm, filename, 'gif', 'WriteMode', 'append');
-    end
-end
-
-function stackedPlotsSens(t, Y, modelName, variation, isStacked)
-    labels = {'Susceptible', 'Infected', 'Recovered', 'Deceased'};
-    color_str = 'brgcmky'; % Color string for different plot lines
-
-    if isStacked
-        % Stacked plot
-        A = cumsum(Y, 1); % Cumulative sum for stacking
-    else
-        % Regular plot
-        A = Y;
-    end
-
-    [m, n] = size(A);
-    xx = [t', fliplr(t')]; % For area plot filling
-
-    for func = 1:m
-        yy = A(func, :);
-        if isStacked
-            % Stacked area plot
-            if func == 1
-                fill(xx, [zeros(1, length(t)), fliplr(yy)], color_str(func), 'LineStyle', 'none');
-            else
-                yy_below = A(func - 1, :);
-                fill(xx, [yy_below, fliplr(yy)], color_str(func), 'LineStyle', 'none');
-            end
-        else
-            % Regular line plot
-            plot(t, yy, color_str(mod(func - 1, length(color_str)) + 1), 'LineWidth', 2);
-        end
-        hold on;
-    end
-
-    xlim([t(1), t(end)]);
-    ylim([0, max(max(A)) * 1.1]); % Add some margin on top
-    title([modelName, ' Variation: ', num2str(variation), '%']);
-    legend(labels, 'Location', 'best');
-    hold off;
 end
