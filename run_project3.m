@@ -39,6 +39,4 @@ function run_project3
     displaySensitivities('QV', beta, gamma, delta, epsilon, q, v);
 
     run_sensitivity_analysis(sens_parameters)
-
-    clear all
 end
